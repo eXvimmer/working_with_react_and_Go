@@ -1,16 +1,10 @@
 import { Route, Switch, Link } from "react-router-dom";
-
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function Movies() {
-  return <h2>Movies</h2>;
-}
-
-function Admin() {
-  return <h2>Manage Catalogue</h2>;
-}
+import Home from "./routes/Home";
+import Movies from "./routes/Movies";
+import Admin from "./routes/Admin";
+import CategoryPage from "./routes/CategoryPage";
+import Categories from "./components/Categories";
+import Movie from "./components/Movie";
 
 function App() {
   return (
@@ -31,6 +25,9 @@ function App() {
                 <Link to="/movies">Movies</Link>
               </li>
               <li className="list-group-item">
+                <Link to="/categories">Categories</Link>
+              </li>
+              <li className="list-group-item">
                 <Link to="/admin">Admin</Link>
               </li>
             </ul>
@@ -39,14 +36,28 @@ function App() {
 
         <div className="col-md-10">
           <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route exact path="/movies/:id" component={Movie} />
             <Route exact path="/movies">
               <Movies />
             </Route>
+            <Route exact path="/categories">
+              <CategoryPage />
+            </Route>
+            <Route
+              exact
+              path="/categories/drama"
+              render={(props) => <Categories {...props} title="Drama" />}
+            />
+            <Route
+              exact
+              path="/categories/comedy"
+              render={(props) => <Categories {...props} title="Comedy" />}
+            />
             <Route exact path="/admin">
               <Admin />
-            </Route>
-            <Route path="/">
-              <Home />
             </Route>
           </Switch>
         </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,9 +10,9 @@ import "./index.css";
 // TODO: migrate to react-router-dom@6.4.0 or latest and use functional
 // components
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Router>
+  <BrowserRouter>
     <React.StrictMode>
       <App />
     </React.StrictMode>
-  </Router>
+  </BrowserRouter>
 );
