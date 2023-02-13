@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/exvimmer/working_with_react_and_go/backend/models"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -33,6 +34,7 @@ type AppStatus struct {
 type application struct {
 	config config
 	logger *log.Logger
+	models models.Models
 }
 
 func main() {
@@ -59,6 +61,7 @@ func main() {
 	app := &application{
 		config: cfg,
 		logger: logger,
+		models: models.NewModels(db),
 	}
 
 	srv := &http.Server{
