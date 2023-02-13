@@ -55,3 +55,5 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+// psql --host=localhost --dbname=go_movies --username=postgres
