@@ -6,32 +6,55 @@ export default class Movies extends Component {
     super(props);
 
     this.state = {
+      isLoading: true, // for the first render
       movies: [],
+      error: null,
     };
   }
 
   componentDidMount() {
-    this.setState({
-      movies: [
-        { id: 1, title: "The Shawshank Redemption", runtime: 142 },
-        { id: 2, title: "The Godfather", runtime: 175 },
-        { id: 3, title: "The Dark Knight", runtime: 153 },
-      ],
-    });
+    fetch("http://localhost:4000/v1/movies")
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error(`invalid response code: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({
+          movies: json.movies,
+          isLoading: false,
+          error: null,
+        });
+      })
+      .catch((err) => {
+        this.setState({
+          isLoading: false,
+          error: err,
+        });
+      });
   }
 
   render() {
-    return (
-      <>
-        <h2>Choose a movie</h2>
-        <ul>
-          {this.state.movies.map((m) => (
-            <li key={m.id}>
-              <Link to={`/movies/${m.id}`}>{m.title}</Link>
-            </li>
-          ))}
-        </ul>
-      </>
-    );
+    const { movies, isLoading, error } = this.state;
+
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (isLoading) {
+      return <p>Loading...</p>;
+    } else {
+      return (
+        <>
+          <h2>Choose a movie</h2>
+          <ul>
+            {movies.map((m) => (
+              <li key={m.id}>
+                <Link to={`/movies/${m.id}`}>{m.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      );
+    }
   }
 }
