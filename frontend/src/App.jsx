@@ -4,6 +4,7 @@ import Movies from "./routes/Movies";
 import Admin from "./routes/Admin";
 import Genres from "./routes/Genres";
 import Movie from "./components/Movie";
+import Genre from "./components/Genre";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route exact path="/genres">
               <Genres />
             </Route>
+            <Route exact path="/genre/:id" component={Genre} />
             <Route exact path="/admin">
               <Admin />
             </Route>
