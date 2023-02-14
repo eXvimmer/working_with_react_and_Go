@@ -9,6 +9,7 @@ class Genre extends Component {
       movies: [],
       isLoading: true,
       error: null,
+      genreName: "",
     };
   }
 
@@ -25,6 +26,7 @@ class Genre extends Component {
           movies: json.movies,
           isLoading: false,
           error: null,
+          genreName: this.props.location.genreName,
         });
       })
       .catch((err) => {
@@ -36,7 +38,7 @@ class Genre extends Component {
   }
 
   render() {
-    let { movies, isLoading, error } = this.state;
+    let { movies, isLoading, error, genreName } = this.state;
     if (!movies || !movies.length) {
       movies = [];
     }
@@ -48,7 +50,7 @@ class Genre extends Component {
     } else {
       return (
         <>
-          <h2>Genre: </h2> {/* TODO: show genre name*/}
+          <h2>Genre: {genreName}</h2>
           <div className="list-group">
             {movies.map((m) => (
               <Link
