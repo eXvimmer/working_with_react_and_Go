@@ -66,6 +66,11 @@ func (m *DBModel) Get(id int) (*Movie, error) {
 		}
 		genres[mg.ID] = mg.Genre.GenreName
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	movie.MovieGenre = genres
 
 	return &movie, nil
@@ -134,9 +139,56 @@ func (m *DBModel) All() ([]*Movie, error) {
 		}
 		genreRows.Close() // don't use defer in a loop
 
+		if err = genreRows.Err(); err != nil {
+			return nil, err
+		}
+
 		movie.MovieGenre = genres
 		movies = append(movies, &movie)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return movies, nil
+}
+
+func (m *DBModel) GenresAll() ([]*Genre, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+    SELECT id, genre_name, created_at, updated_at
+    FROM genres
+    ORDER BY genre_name;
+  `
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var genres []*Genre
+
+	for rows.Next() {
+		var g Genre
+		err := rows.Scan(
+			&g.ID,
+			&g.GenreName,
+			&g.CreatedAt,
+			&g.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		genres = append(genres, &g)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return genres, nil
 }
