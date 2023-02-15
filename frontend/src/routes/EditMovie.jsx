@@ -1,4 +1,5 @@
 import { Component } from "react";
+import Input from "../components/Input";
 import "./EditMovie.css";
 
 export class EditMovie extends Component {
@@ -49,46 +50,26 @@ export class EditMovie extends Component {
         <hr />
         <form onSubmit={this.handleSubmit}>
           <input type="hidden" name="id" value={movie.id} id="id" />
-          <div className="mb-3">
-            <label htmlFor="title" className="form-label">
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              className="form-control"
-              value={movie.title}
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="release_date" className="form-label">
-              Release Date
-            </label>
-            <input
-              type="date"
-              id="release_date"
-              name="release_date"
-              className="form-control"
-              value={movie.release_date}
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="runtime" className="form-label">
-              Runtime
-            </label>
-            <input
-              type="number"
-              id="runtime"
-              name="runtime"
-              className="form-control"
-              value={movie.runtime}
-              onChange={this.handleChange}
-            />
-          </div>
-
+          <Input
+            title="Title"
+            name="title"
+            value={movie.title}
+            handleChange={this.handleChange}
+          />
+          <Input
+            title="Release Date"
+            name="release_date"
+            value={movie.release_date}
+            handleChange={this.handleChange}
+            type="date"
+          />
+          <Input
+            type="number"
+            name="runtime"
+            value={movie.runtime}
+            handleChange={this.handleChange}
+            title="Runtime"
+          />
           <div className="mb-3">
             <label htmlFor="mpaa_rating" className="form-label">
               MPAA Rating
@@ -119,21 +100,13 @@ export class EditMovie extends Component {
               </option>
             </select>
           </div>
-          <div className="mb-3">
-            <label htmlFor="rating" className="form-label">
-              Rating
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              id="rating"
-              name="rating"
-              className="form-control"
-              value={movie.rating}
-              onChange={this.handleChange}
-            />
-          </div>
+          <Input
+            title="Rating"
+            name="rating"
+            value={movie.rating}
+            handleChange={this.handleChange}
+            type="number"
+          />
           <div className="mb-3">
             <label htmlFor="description" className="form-label">
               Description
@@ -150,6 +123,9 @@ export class EditMovie extends Component {
           <hr />
           <button className="btn btn-primary">Save</button>
         </form>
+        <div className="mb-3">
+          <pre>{JSON.stringify(this.state, null, 3)}</pre>
+        </div>
       </>
     );
   }
