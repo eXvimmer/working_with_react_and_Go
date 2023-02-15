@@ -90,28 +90,55 @@ func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 	}
 	year := releaseDate.Year()
 
-	movie := models.Movie{
-		ID:          id,
-		Title:       payload.Title,
-		Description: payload.Description,
-		Runtime:     runtime,
-		Rating:      rating,
-		ReleaseDate: releaseDate,
-		Year:        year,
-		MPAARating:  payload.MPAARating,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+	var movie *models.Movie
+
+	// TODO: this code is messy and duplicated, refactor it.
+	if id != 0 { // this means we're updating an existing movie, not creating a new one
+		m, err := app.models.DB.Get(id)
+		if err != nil {
+			app.errorJSON(w, err)
+			return
+		}
+		movie = m
+		movie.UpdatedAt = time.Now()
 	}
 
-	err = app.models.DB.InsertMovie(&movie)
-	if err != nil {
-		app.errorJSON(w, err)
-		return
+	movie.ID = id
+	movie.Title = payload.Title
+	movie.Description = payload.Description
+	movie.Runtime = runtime
+	movie.Rating = rating
+	movie.ReleaseDate = releaseDate
+	movie.Year = year
+	movie.MPAARating = payload.MPAARating
+	movie.CreatedAt = time.Now()
+	movie.UpdatedAt = time.Now()
+
+	if movie.ID == 0 { // add a movie
+		err = app.models.DB.InsertMovie(movie)
+		if err != nil {
+			app.errorJSON(w, err)
+			return
+		}
+	} else { // update a movie
+		err = app.models.DB.UpdateMovie(movie)
+		if err != nil {
+			app.errorJSON(w, err)
+			return
+		}
+	}
+
+	var message string
+
+	if id == 0 {
+		message = "created the new movie"
+	} else {
+		message = "changed saved!"
 	}
 
 	ok := jsonResp{
 		OK:      true,
-		Message: "created",
+		Message: message,
 	}
 	err = app.writeJSON(w, http.StatusOK, ok, "response")
 	if err != nil {
