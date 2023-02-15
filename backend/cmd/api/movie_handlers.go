@@ -1,12 +1,31 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/exvimmer/working_with_react_and_go/backend/models"
 	"github.com/julienschmidt/httprouter"
 )
+
+type MoviePayload struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ReleaseDate string `json:"release_date"`
+	Runtime     string `json:"runtime"`
+	Rating      string `json:"rating"`
+	MPAARating  string `json:"mpaa_rating"`
+	Year        string `json:"year"`
+}
+
+type jsonResp struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
 
 func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
@@ -41,9 +60,64 @@ func (app *application) getAllMovies(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {}
 
-func (app *application) insertMovie(w http.ResponseWriter, r *http.Request) {}
+func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
+	var payload MoviePayload
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
 
-func (app *application) updateMovie(w http.ResponseWriter, r *http.Request) {}
+	id, err := strconv.Atoi(payload.ID)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	runtime, err := strconv.Atoi(payload.Runtime)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	rating, err := strconv.Atoi(payload.Rating)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	releaseDate, err := time.Parse("2006-01-02", payload.ReleaseDate)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	year := releaseDate.Year()
+
+	movie := models.Movie{
+		ID:          id,
+		Title:       payload.Title,
+		Description: payload.Description,
+		Runtime:     runtime,
+		Rating:      rating,
+		ReleaseDate: releaseDate,
+		Year:        year,
+		MPAARating:  payload.MPAARating,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	err = app.models.DB.InsertMovie(&movie)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	ok := jsonResp{
+		OK:      true,
+		Message: "created",
+	}
+	err = app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
 
 func (app *application) searchMovies(w http.ResponseWriter, r *http.Request) {}
 

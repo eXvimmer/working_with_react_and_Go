@@ -190,7 +190,7 @@ export class EditMovie extends Component {
               options={this.state.mpaaOptions}
               className={this.hasError("mpaa_rating") ? "is-invalid" : ""}
               errorDiv={this.hasError("mpaa_rating") ? "text-danger" : "d-none"}
-              errorMsg="please choose a mpaa_rating"
+              errorMsg="please choose a MPAA rating"
             />
             <Input
               title="Rating"
