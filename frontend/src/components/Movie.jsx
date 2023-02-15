@@ -86,7 +86,7 @@ export class Movie extends Component {
               </tr>
               <tr>
                 <td>
-                  <strong>Run time:</strong>
+                  <strong>Runtime:</strong>
                 </td>
                 <td>
                   <strong>{movie.runtime} minutes</strong>

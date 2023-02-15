@@ -3,6 +3,7 @@ import Home from "./routes/Home";
 import Movies from "./routes/Movies";
 import Admin from "./routes/Admin";
 import Genres from "./routes/Genres";
+import EditMovie from "./routes/EditMovie";
 import Movie from "./components/Movie";
 import Genre from "./components/Genre";
 
@@ -28,6 +29,9 @@ function App() {
                 <Link to="/genres">Genres</Link>
               </li>
               <li className="list-group-item">
+                <Link to="/admin/add">Add movie</Link>
+              </li>
+              <li className="list-group-item">
                 <Link to="/admin">Admin</Link>
               </li>
             </ul>
@@ -47,6 +51,7 @@ function App() {
               <Genres />
             </Route>
             <Route exact path="/genre/:id" component={Genre} />
+            <Route exact path="/admin/add" component={EditMovie} />
             <Route exact path="/admin">
               <Admin />
             </Route>
