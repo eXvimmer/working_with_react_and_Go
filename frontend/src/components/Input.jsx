@@ -5,6 +5,9 @@ function Input({
   title,
   value,
   handleChange,
+  className,
+  errorDiv,
+  errorMsg,
   type = "text",
   placeholder = "",
 }) {
@@ -17,11 +20,12 @@ function Input({
         type={type}
         id={name}
         name={name}
-        className="form-control"
+        className={`form-control ${className}`}
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
       />
+      <div className={errorDiv}>{errorMsg}</div>
     </div>
   );
 }

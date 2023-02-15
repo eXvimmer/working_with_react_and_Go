@@ -20,6 +20,7 @@ export class EditMovie extends Component {
       },
       isLoading: true,
       error: null,
+      errors: [], // form errors
       mpaaOptions: [
         { id: "G", value: "G" },
         { id: "PG", value: "PG" },
@@ -31,6 +32,7 @@ export class EditMovie extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.hasError = this.hasError.bind(this);
   }
 
   componentDidMount() {
@@ -66,8 +68,14 @@ export class EditMovie extends Component {
   }
 
   handleChange(e) {
+    const errors = [...this.state.errors];
+    const index = errors.indexOf(e.target.name);
+    if (index !== -1) {
+      errors.splice(index, 1);
+    }
     this.setState((prev) => {
       return {
+        errors,
         movie: {
           ...prev.movie,
           [e.target.name]: e.target.value,
@@ -78,6 +86,54 @@ export class EditMovie extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+
+    if (this.state.errors.length) {
+      return false;
+    }
+
+    const { title, description, release_date, runtime, rating, mpaa_rating } =
+      this.state.movie;
+    const errors = [];
+    if (!title) {
+      errors.push("title");
+    }
+    if (!description) {
+      errors.push("description");
+    }
+    if (!release_date) {
+      errors.push("release_date");
+    }
+    if (!runtime || +runtime < 0) {
+      errors.push("runtime");
+    }
+    if (!rating || +rating < 1 || +rating > 5) {
+      errors.push("rating");
+    }
+    if (!mpaa_rating) {
+      errors.push("mpaa_rating");
+    }
+
+    this.setState({ errors });
+
+    if (errors.length) {
+      return false; // don't submit
+    }
+
+    const payload = Object.fromEntries(new FormData(e.target));
+    fetch(`http://localhost:4000/v1/admin/editmovie`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+  }
+
+  hasError(key) {
+    return this.state.errors.includes(key);
   }
 
   render() {
@@ -99,6 +155,9 @@ export class EditMovie extends Component {
               name="title"
               value={movie.title}
               handleChange={this.handleChange}
+              className={this.hasError("title") ? "is-invalid" : ""}
+              errorDiv={this.hasError("title") ? "text-danger" : "d-none"}
+              errorMsg="please enter a title"
             />
             <Input
               title="Release Date"
@@ -106,6 +165,11 @@ export class EditMovie extends Component {
               value={movie.release_date}
               handleChange={this.handleChange}
               type="date"
+              className={this.hasError("release_date") ? "is-invalid" : ""}
+              errorDiv={
+                this.hasError("release_date") ? "text-danger" : "d-none"
+              }
+              errorMsg="please enter a release date"
             />
             <Input
               type="number"
@@ -113,6 +177,9 @@ export class EditMovie extends Component {
               value={movie.runtime}
               handleChange={this.handleChange}
               title="Runtime"
+              className={this.hasError("runtime") ? "is-invalid" : ""}
+              errorDiv={this.hasError("runtime") ? "text-danger" : "d-none"}
+              errorMsg="please enter a runtime greater than zero"
             />
             <Select
               handleChange={this.handleChange}
@@ -120,8 +187,10 @@ export class EditMovie extends Component {
               title="MPAA Rating"
               value={movie.mpaa_rating}
               name="mpaa_rating"
-              required={true}
               options={this.state.mpaaOptions}
+              className={this.hasError("mpaa_rating") ? "is-invalid" : ""}
+              errorDiv={this.hasError("mpaa_rating") ? "text-danger" : "d-none"}
+              errorMsg="please choose a mpaa_rating"
             />
             <Input
               title="Rating"
@@ -129,6 +198,9 @@ export class EditMovie extends Component {
               value={movie.rating}
               handleChange={this.handleChange}
               type="number"
+              className={this.hasError("rating") ? "is-invalid" : ""}
+              errorDiv={this.hasError("rating") ? "text-danger" : "d-none"}
+              errorMsg="please enter a rating between 1 and 5 (exclusive)"
             />
             <TextArea
               title="Description"
@@ -136,6 +208,9 @@ export class EditMovie extends Component {
               value={movie.description}
               handleChange={this.handleChange}
               rows={3}
+              className={this.hasError("description") ? "is-invalid" : ""}
+              errorDiv={this.hasError("description") ? "text-danger" : "d-none"}
+              errorMsg="please enter a description"
             />
             <hr />
             <button className="btn btn-primary">Save</button>
