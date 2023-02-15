@@ -6,20 +6,38 @@ export class EditMovie extends Component {
     super(props);
 
     this.state = {
-      movie: {},
+      movie: {
+        id: 0,
+        title: "",
+        description: "",
+        release_date: "",
+        runtime: "",
+        rating: "",
+        mpaa_rating: "",
+      },
       isLoading: true,
       error: null,
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  componentDidMount() {
-    // TODO: replace this placeholder data with real one
-    this.setState({
-      movie: {
-        title: "The Dark Knight",
-        mpaa_rating: "R",
-      },
+  componentDidMount() {}
+
+  handleChange(e) {
+    this.setState((prev) => {
+      return {
+        movie: {
+          ...prev.movie,
+          [e.target.name]: e.target.value,
+        },
+      };
     });
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
   }
 
   render() {
@@ -29,7 +47,8 @@ export class EditMovie extends Component {
       <>
         <h2>Add/Edit Movie</h2>
         <hr />
-        <form>
+        <form onSubmit={this.handleSubmit}>
+          <input type="hidden" name="id" value={movie.id} id="id" />
           <div className="mb-3">
             <label htmlFor="title" className="form-label">
               Title
@@ -40,6 +59,7 @@ export class EditMovie extends Component {
               name="title"
               className="form-control"
               value={movie.title}
+              onChange={this.handleChange}
             />
           </div>
           <div className="mb-3">
@@ -52,6 +72,7 @@ export class EditMovie extends Component {
               name="release_date"
               className="form-control"
               value={movie.release_date}
+              onChange={this.handleChange}
             />
           </div>
           <div className="mb-3">
@@ -64,6 +85,7 @@ export class EditMovie extends Component {
               name="runtime"
               className="form-control"
               value={movie.runtime}
+              onChange={this.handleChange}
             />
           </div>
 
@@ -75,6 +97,7 @@ export class EditMovie extends Component {
               id="mpaa_rating"
               name="mpaa_rating"
               value={movie.mpaa_rating}
+              onChange={this.handleChange}
               className="form-select"
               required
             >
@@ -108,6 +131,7 @@ export class EditMovie extends Component {
               name="rating"
               className="form-control"
               value={movie.rating}
+              onChange={this.handleChange}
             />
           </div>
           <div className="mb-3">
@@ -119,9 +143,9 @@ export class EditMovie extends Component {
               name="description"
               className="form-control"
               rows="3"
-            >
-              {movie.description}
-            </textarea>
+              value={movie.description}
+              onChange={this.handleChange}
+            />
           </div>
           <hr />
           <button className="btn btn-primary">Save</button>
