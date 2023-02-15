@@ -1,4 +1,5 @@
 import { Component } from "react";
+import Alert from "../components/Alert";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import TextArea from "../components/TextArea";
@@ -9,6 +10,10 @@ export class EditMovie extends Component {
     super(props);
 
     this.state = {
+      alert: {
+        type: "d-none", // don't show at first (bootstrap class)
+        message: "",
+      },
       movie: {
         id: 0,
         title: "",
@@ -128,7 +133,21 @@ export class EditMovie extends Component {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        if (data.error) {
+          this.setState({
+            alert: {
+              type: "alert-danger",
+              message: data.error,
+            },
+          });
+        } else {
+          this.setState({
+            alert: {
+              type: "alert-success",
+              message: "changes saved!",
+            },
+          });
+        }
       });
   }
 
@@ -137,7 +156,7 @@ export class EditMovie extends Component {
   }
 
   render() {
-    const { movie, isLoading, error } = this.state;
+    const { movie, isLoading, error, alert } = this.state;
 
     if (error) {
       return <div>Error: {error.message}</div>;
@@ -147,6 +166,7 @@ export class EditMovie extends Component {
       return (
         <>
           <h2>Add/Edit Movie</h2>
+          <Alert type={alert.type} message={alert.message} />
           <hr />
           <form onSubmit={this.handleSubmit}>
             <input type="hidden" name="id" value={movie.id} id="id" />
