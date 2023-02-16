@@ -1,4 +1,7 @@
 import { Component } from "react";
+import { Link } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import Alert from "../components/Alert";
 import Input from "../components/Input";
 import Select from "../components/Select";
@@ -38,6 +41,7 @@ export class EditMovie extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.hasError = this.hasError.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
   }
 
   componentDidMount() {
@@ -141,18 +145,86 @@ export class EditMovie extends Component {
             },
           });
         } else {
-          this.setState({
-            alert: {
-              type: "alert-success",
-              message: "changes saved!",
-            },
-          });
+          if (this.state.movie.id === 0) {
+            this.setState({
+              alert: {
+                type: "alert-success",
+                message: "create the movie",
+              },
+            });
+          } else {
+            this.setState({
+              alert: {
+                type: "alert-success",
+                message: "changes saved!",
+              },
+            });
+          }
+          setTimeout(() => {
+            this.props.history.push({
+              pathname: "/movies",
+            });
+          }, 2000);
         }
       });
   }
 
   hasError(key) {
     return this.state.errors.includes(key);
+  }
+
+  confirmDelete(e) {
+    e.preventDefault();
+    confirmAlert({
+      title: "Delete Movie?",
+      message: "Are you sure to delete this movie?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            fetch(
+              `http://localhost:4000/v1/admin/deletemovie/${this.state.movie.id}`,
+              { method: "GET" }
+            )
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.error) {
+                  this.setState({
+                    alert: {
+                      type: "alert-danger",
+                      message: data.error,
+                    },
+                  });
+                } else {
+                  this.setState({
+                    alert: {
+                      type: "alert-success",
+                      message: "movie deleted",
+                    },
+                  });
+                  setTimeout(() => {
+                    this.props.history.push({
+                      pathname: "/admin",
+                    });
+                  }, 2000);
+                }
+              })
+              .catch((error) => {
+                this.setState({
+                  alert: {
+                    type: "alert-danger",
+                    message: error,
+                  },
+                });
+              });
+          },
+        },
+        {
+          label: "No",
+          onClick: () => false,
+        },
+      ],
+    });
   }
 
   render() {
@@ -234,6 +306,14 @@ export class EditMovie extends Component {
             />
             <hr />
             <button className="btn btn-primary">Save</button>
+            <Link to="/admin" className="btn btn-warning ms-1">
+              Cancel
+            </Link>
+            {movie.id > 0 && (
+              <a onClick={this.confirmDelete} className="btn btn-danger ms-1">
+                Delete
+              </a>
+            )}
           </form>
         </>
       );
