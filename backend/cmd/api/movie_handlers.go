@@ -110,7 +110,7 @@ func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 	}
 	year := releaseDate.Year()
 
-	var movie *models.Movie
+	var movie models.Movie
 
 	// TODO: this code is messy and duplicated, refactor it.
 	if id != 0 { // this means we're updating an existing movie, not creating a new one
@@ -119,29 +119,31 @@ func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 			app.errorJSON(w, err)
 			return
 		}
-		movie = m
+		movie = *m
+		movie.Title = payload.Title
+		movie.Description = payload.Description
+		movie.Runtime = runtime
+		movie.Rating = rating
+		movie.ReleaseDate = releaseDate
+		movie.Year = year
+		movie.MPAARating = payload.MPAARating
 		movie.UpdatedAt = time.Now()
-	}
-
-	movie.ID = id
-	movie.Title = payload.Title
-	movie.Description = payload.Description
-	movie.Runtime = runtime
-	movie.Rating = rating
-	movie.ReleaseDate = releaseDate
-	movie.Year = year
-	movie.MPAARating = payload.MPAARating
-	movie.CreatedAt = time.Now()
-	movie.UpdatedAt = time.Now()
-
-	if movie.ID == 0 { // add a movie
-		err = app.models.DB.InsertMovie(movie)
+		err = app.models.DB.UpdateMovie(&movie)
 		if err != nil {
 			app.errorJSON(w, err)
 			return
 		}
-	} else { // update a movie
-		err = app.models.DB.UpdateMovie(movie)
+	} else {
+		movie.Title = payload.Title
+		movie.Description = payload.Description
+		movie.Runtime = runtime
+		movie.Rating = rating
+		movie.ReleaseDate = releaseDate
+		movie.Year = year
+		movie.MPAARating = payload.MPAARating
+		movie.CreatedAt = time.Now()
+		movie.UpdatedAt = time.Now()
+		err = app.models.DB.InsertMovie(&movie)
 		if err != nil {
 			app.errorJSON(w, err)
 			return
