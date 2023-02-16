@@ -149,7 +149,7 @@ export class EditMovie extends Component {
             this.setState({
               alert: {
                 type: "alert-success",
-                message: "create the movie",
+                message: "created the movie",
               },
             });
           } else {
@@ -162,7 +162,7 @@ export class EditMovie extends Component {
           }
           setTimeout(() => {
             this.props.history.push({
-              pathname: "/movies",
+              pathname: "/admin",
             });
           }, 2000);
         }
