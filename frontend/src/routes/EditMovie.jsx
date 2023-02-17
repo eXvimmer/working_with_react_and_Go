@@ -141,7 +141,7 @@ export class EditMovie extends Component {
           this.setState({
             alert: {
               type: "alert-danger",
-              message: data.error,
+              message: data.error.message,
             },
           });
         } else {
@@ -192,7 +192,7 @@ export class EditMovie extends Component {
                   this.setState({
                     alert: {
                       type: "alert-danger",
-                      message: data.error,
+                      message: data.error.message,
                     },
                   });
                 } else {
