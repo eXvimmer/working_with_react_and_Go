@@ -74,17 +74,9 @@ export class Login extends Component {
           });
         } else {
           this.props.handleJWTChange(data.response);
-          this.setState({
-            alert: {
-              type: "alert-success",
-              message: "logged in",
-            },
+          this.props.history.push({
+            pathname: "/admin",
           });
-          setTimeout(() => {
-            this.props.history.push({
-              pathname: "/admin",
-            });
-          }, 2000);
         }
       })
       .catch((error) => {

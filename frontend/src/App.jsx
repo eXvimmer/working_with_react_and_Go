@@ -100,7 +100,13 @@ class App extends Component {
                 <Genres />
               </Route>
               <Route exact path="/genre/:id" component={Genre} />
-              <Route exact path="/admin/movie/:id" component={EditMovie} />
+              <Route
+                exact
+                path="/admin/movie/:id"
+                component={(props) => (
+                  <EditMovie {...props} jwt={this.state.jwt} />
+                )}
+              />
               <Route exact path="/admin">
                 <Admin />
               </Route>

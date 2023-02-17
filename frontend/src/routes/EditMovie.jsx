@@ -128,10 +128,15 @@ export class EditMovie extends Component {
       return false; // don't submit
     }
 
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + this.props.jwt,
+    });
     const payload = Object.fromEntries(new FormData(e.target));
     fetch(`http://localhost:4000/v1/admin/editmovie`, {
       method: "POST",
       body: JSON.stringify(payload),
+      headers,
     })
       .then((response) => {
         return response.json();
@@ -164,7 +169,7 @@ export class EditMovie extends Component {
             this.props.history.push({
               pathname: "/admin",
             });
-          }, 2000);
+          }, 1500);
         }
       });
   }
@@ -206,7 +211,7 @@ export class EditMovie extends Component {
                     this.props.history.push({
                       pathname: "/admin",
                     });
-                  }, 2000);
+                  }, 1500);
                 }
               })
               .catch((error) => {
