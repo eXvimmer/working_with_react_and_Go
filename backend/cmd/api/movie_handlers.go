@@ -59,7 +59,14 @@ func (app *application) getAllMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
-	params := httprouter.ParamsFromContext(r.Context())
+	// params := httprouter.ParamsFromContext(r.Context())
+	// HACK: this is a workaround to make the code work; the instructor's
+	// implementation is faulty
+	params, ok := r.Context().Value(RouterParams("params")).(httprouter.Params)
+	if !ok {
+		app.errorJSON(w, errors.New(http.StatusText(http.StatusInternalServerError)), http.StatusInternalServerError)
+		return
+	}
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		app.errorJSON(w, err)
@@ -70,11 +77,11 @@ func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
 		app.errorJSON(w, err)
 		return
 	}
-	ok := jsonResp{
+	res := jsonResp{
 		OK:      true,
 		Message: "deleted",
 	}
-	err = app.writeJSON(w, http.StatusOK, ok, "response")
+	err = app.writeJSON(w, http.StatusOK, res, "response")
 	if err != nil {
 		app.errorJSON(w, err)
 	}
