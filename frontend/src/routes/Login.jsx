@@ -2,7 +2,7 @@ import { Component } from "react";
 import Alert from "../components/Alert";
 import Input from "../components/Input";
 
-export class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
 

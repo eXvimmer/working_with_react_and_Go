@@ -21,14 +21,25 @@ class App extends Component {
     this.logout = this.logout.bind(this);
   }
 
+  componentDidMount() {
+    if (!this.state.jwt) {
+      const jwt = localStorage.getItem("jwt");
+      if (jwt) {
+        this.setState({ jwt });
+      }
+    }
+  }
+
   handleJWTChange(jwt) {
     this.setState({ jwt });
+    localStorage.setItem("jwt", jwt);
   }
 
   logout() {
     this.setState({
       jwt: "",
     });
+    localStorage.removeItem("jwt");
   }
 
   render() {
@@ -107,9 +118,11 @@ class App extends Component {
                   <EditMovie {...props} jwt={this.state.jwt} />
                 )}
               />
-              <Route exact path="/admin">
-                <Admin />
-              </Route>
+              <Route
+                exact
+                path="/admin"
+                component={(props) => <Admin {...props} jwt={this.state.jwt} />}
+              />
             </Switch>
           </div>
         </div>

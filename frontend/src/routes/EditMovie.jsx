@@ -45,6 +45,12 @@ export class EditMovie extends Component {
   }
 
   componentDidMount() {
+    if (!this.props.jwt) {
+      this.props.history.push({
+        pathname: "/login",
+      });
+      return;
+    }
     const { id } = this.props.match.params;
     if (id > 0) {
       fetch(`http://localhost:4000/v1/movie/${id}`)
@@ -180,6 +186,8 @@ export class EditMovie extends Component {
 
   confirmDelete(e) {
     e.preventDefault();
+    const { id } = this.state.movie;
+    const { jwt } = this.props;
     confirmAlert({
       title: "Delete Movie?",
       message: "Are you sure to delete this movie?",
@@ -187,10 +195,14 @@ export class EditMovie extends Component {
         {
           label: "Yes",
           onClick: () => {
-            fetch(
-              `http://localhost:4000/v1/admin/deletemovie/${this.state.movie.id}`,
-              { method: "GET" }
-            )
+            const headers = new Headers({
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + jwt,
+            });
+            fetch("http://localhost:4000/v1/admin/deletemovie/" + id, {
+              method: "GET",
+              headers,
+            })
               .then((response) => response.json())
               .then((data) => {
                 if (data.error) {
