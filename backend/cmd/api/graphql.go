@@ -55,8 +55,9 @@ var fields = graphql.Fields{
 			var theList []*models.Movie
 			search, ok := p.Args["titleContains"].(string)
 			if ok {
+				search = strings.ToLower(search)
 				for _, m := range movies {
-					if strings.Contains(m.Title, search) {
+					if strings.Contains(strings.ToLower(m.Title), search) {
 						theList = append(theList, m)
 					}
 				}
