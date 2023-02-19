@@ -8,6 +8,7 @@ import EditMovie from "./routes/EditMovie";
 import Movie from "./components/Movie";
 import Genre from "./components/Genre";
 import Login from "./routes/Login";
+import GraphQL from "./routes/GraphQL";
 
 class App extends Component {
   constructor(props) {
@@ -85,6 +86,9 @@ class App extends Component {
                     <li className="list-group-item">
                       <Link to="/admin">Admin</Link>
                     </li>
+                    <li className="list-group-item">
+                      <Link to="/graphql">GraphQL</Link>
+                    </li>
                   </>
                 )}
               </ul>
@@ -123,6 +127,7 @@ class App extends Component {
                 path="/admin"
                 component={(props) => <Admin {...props} jwt={this.state.jwt} />}
               />
+              <Route exact path="/graphql" component={GraphQL} />
             </Switch>
           </div>
         </div>
