@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/exvimmer/working_with_react_and_go/backend/models"
 	"github.com/graphql-go/graphql"
@@ -40,6 +41,27 @@ var fields = graphql.Fields{
 		Description: "Get all movies",
 		Resolve: func(p graphql.ResolveParams) (any, error) {
 			return movies, nil
+		},
+	},
+	"search": &graphql.Field{
+		Type:        graphql.NewList(movieType),
+		Description: "Search movies by title",
+		Args: graphql.FieldConfigArgument{
+			"titleContains": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (any, error) {
+			var theList []*models.Movie
+			search, ok := p.Args["titleContains"].(string)
+			if ok {
+				for _, m := range movies {
+					if strings.Contains(m.Title, search) {
+						theList = append(theList, m)
+					}
+				}
+			}
+			return theList, nil
 		},
 	},
 }
