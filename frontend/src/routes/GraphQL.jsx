@@ -1,4 +1,15 @@
 import { Component } from "react";
+import Input from "../components/Input";
+
+// function debounce(fn, timeout = 300) {
+//   let timer;
+//   return (...args) => {
+//     clearTimeout(timer);
+//     timer = setTimeout(() => {
+//       fn.apply(this, args);
+//     }, timeout);
+//   };
+// }
 
 class GraphQL extends Component {
   constructor(props) {
@@ -6,6 +17,7 @@ class GraphQL extends Component {
 
     this.state = {
       movies: [],
+      searchTerm: "",
       // TODO: rmeove these states, if you're not using them
       isLoading: true,
       error: null,
@@ -14,6 +26,9 @@ class GraphQL extends Component {
         message: "",
       },
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.performSearch = this.performSearch.bind(this);
   }
 
   componentDidMount() {
@@ -31,7 +46,7 @@ class GraphQL extends Component {
     const headers = new Headers({
       "Content-Type": "application/json",
     });
-    fetch("http://localhost:4000/graphql/list", {
+    fetch("http://localhost:4000/graphql", {
       method: "post",
       body,
       headers,
@@ -52,12 +67,75 @@ class GraphQL extends Component {
       });
   }
 
+  handleChange(e) {
+    this.setState({
+      searchTerm: e.target.value,
+    });
+  }
+
+  performSearch(e) {
+    e.preventDefault();
+
+    const body = `
+    {
+      search(titleContains: "${this.state.searchTerm}") {
+        id
+        title
+        runtime
+        year
+        description
+      }
+    }
+    `;
+    const headers = new Headers({
+      "Content-Type": "application/json",
+    });
+    fetch("http://localhost:4000/graphql", {
+      method: "post",
+      body,
+      headers,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.data.search.length) {
+          this.setState({
+            movies: data.data.search,
+            isLoading: false,
+            error: null,
+          });
+        } else {
+          this.setState({
+            movies: [],
+            isLoading: false,
+            erorr: null,
+          });
+        }
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          isLoading: false,
+        });
+      });
+  }
+
   render() {
     const { movies } = this.state;
     return (
       <>
         <h2>GraphQL</h2>
         <hr />
+        <form onSubmit={this.performSearch}>
+          <Input
+            title="Search"
+            type="search"
+            name="search"
+            value={this.state.searchTerm}
+            handleChange={this.handleChange}
+            placeholder="Enter the keyword and then press enter"
+          />
+          {/*<button type="submit" className="btn btn-primary">Search</button>*/}
+        </form>
         <div className="list-group">
           {movies.map((m) => (
             <a
