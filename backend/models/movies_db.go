@@ -91,7 +91,7 @@ func (m *DBModel) All(genre ...int) ([]*Movie, error) {
 
 	query := fmt.Sprintf(`
     SELECT id, title, description, year, release_date, rating, runtime,
-           mpaa_rating, created_at, updated_at
+           mpaa_rating, created_at, updated_at, COALESCE(poster, '')
     FROM movies
     %s
     ORDER BY title;
@@ -116,6 +116,7 @@ func (m *DBModel) All(genre ...int) ([]*Movie, error) {
 			&movie.MPAARating,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
+			&movie.Poster,
 		)
 		if err != nil {
 			return nil, err
