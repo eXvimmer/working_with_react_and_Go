@@ -8,6 +8,8 @@ import Select from "../components/Select";
 import TextArea from "../components/TextArea";
 import "./EditMovie.css";
 
+// TODO: remove setTimeouts when redirecting
+
 export class EditMovie extends Component {
   constructor(props) {
     super(props);
