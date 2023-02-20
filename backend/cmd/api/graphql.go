@@ -12,6 +12,9 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+// TODO: This whole section is implemented stupidly, change it; Also make the
+// schema to appear in frontend.
+
 var movies []*models.Movie
 
 // GraphQL schema definition
@@ -25,7 +28,7 @@ var fields = graphql.Fields{
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (any, error) {
-			id, ok := p.Args["int"].(int)
+			id, ok := p.Args["id"].(int)
 			if ok {
 				for _, m := range movies {
 					if m.ID == id {
