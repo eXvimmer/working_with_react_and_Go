@@ -3,7 +3,11 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"io"
+	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -135,6 +139,9 @@ func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 		movie.Year = year
 		movie.MPAARating = payload.MPAARating
 		movie.UpdatedAt = time.Now()
+		if movie.Poster == "" {
+			movie = getPoster(movie)
+		}
 		err = app.models.DB.UpdateMovie(&movie)
 		if err != nil {
 			app.errorJSON(w, err)
@@ -175,8 +182,6 @@ func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) searchMovies(w http.ResponseWriter, r *http.Request) {}
-
 func (app *application) getAllGenres(w http.ResponseWriter, r *http.Request) {
 	genres, err := app.models.DB.GenresAll()
 	if err != nil {
@@ -205,4 +210,64 @@ func (app *application) getAllMoviesByGenre(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		app.errorJSON(w, err)
 	}
+}
+
+func getPoster(movie models.Movie) models.Movie {
+	type TheMovieDB struct {
+		Page    int `json:"page"`
+		Results []struct {
+			Adult            bool    `json:"adult"`
+			BackdropPath     string  `json:"backdrop_path"`
+			GenreIds         []int   `json:"genre_ids"`
+			ID               int     `json:"id"`
+			OriginalLanguage string  `json:"original_language"`
+			OriginalTitle    string  `json:"original_title"`
+			Overview         string  `json:"overview"`
+			Popularity       float64 `json:"popularity"`
+			PosterPath       string  `json:"poster_path"`
+			ReleaseDate      string  `json:"release_date"`
+			Title            string  `json:"title"`
+			Video            bool    `json:"video"`
+			VoteAverage      float64 `json:"vote_average"`
+			VoteCount        int     `json:"vote_count"`
+		} `json:"results"`
+		TotalPages   int `json:"total_pages"`
+		TotalResults int `json:"total_results"`
+	}
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	apiKey := os.Getenv("TMDB_API_KEY")
+	theUrl := "https://api.themoviedb.org/3/search/movie?api_key="
+	query := "&query=" + url.QueryEscape(movie.Title)
+	req, err := http.NewRequest("GET", theUrl+apiKey+query, nil)
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+	defer resp.Body.Close()
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+
+	var responseObject TheMovieDB
+	err = json.Unmarshal(bodyBytes, &responseObject)
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+	if len(responseObject.Results) > 0 {
+		movie.Poster = responseObject.Results[0].PosterPath
+	}
+	return movie
 }
