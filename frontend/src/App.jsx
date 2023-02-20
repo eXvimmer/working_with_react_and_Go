@@ -9,6 +9,7 @@ import Movie from "./components/Movie";
 import Genre from "./components/Genre";
 import Login from "./routes/Login";
 import GraphQL from "./routes/GraphQL";
+import MovieGraphQL from "./components/MovieGraphQL";
 
 class App extends Component {
   constructor(props) {
@@ -108,6 +109,7 @@ class App extends Component {
                 )}
               />
               <Route exact path="/movies/:id" component={Movie} />
+              <Route exact path="/moviesgraphql/:id" component={MovieGraphQL} />
               <Route exact path="/movies">
                 <Movies />
               </Route>

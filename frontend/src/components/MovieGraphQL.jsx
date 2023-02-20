@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-class Movie extends Component {
+class MovieGraphQL extends Component {
   constructor(props) {
     super(props);
 
@@ -12,24 +12,45 @@ class Movie extends Component {
   }
 
   componentDidMount() {
-    fetch(`http://localhost:4000/v1/movie/${this.props.match.params.id}`)
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error(`invalid response code: ${response.status}`);
+    const body = `
+    {
+      movie(id: ${this.props.match.params.id}) {
+        id
+        title
+        runtime
+        year
+        description
+        release_date
+        rating
+        mpaa_rating
+      }
+    }
+    `;
+    const headers = new Headers({
+      "Content-Type": "application/json",
+    });
+    fetch("http://localhost:4000/graphql", {
+      method: "post",
+      body,
+      headers,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.data.movie) {
+          this.setState({
+            movie: data.data.movie,
+            isLoading: false,
+            error: null,
+          });
+        } else {
+          throw new Error("movie not found");
         }
-        return response.json();
       })
-      .then((json) => {
+      .catch((error) => {
         this.setState({
-          movie: json.movie,
+          movie: {},
+          error,
           isLoading: false,
-          error: null,
-        });
-      })
-      .catch((err) => {
-        this.setState({
-          isLoading: false,
-          error: err,
         });
       });
   }
@@ -100,4 +121,4 @@ class Movie extends Component {
   }
 }
 
-export default Movie;
+export default MovieGraphQL;

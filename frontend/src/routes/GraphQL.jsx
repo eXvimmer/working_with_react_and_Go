@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { Link } from "react-router-dom";
 import Input from "../components/Input";
 
 // function debounce(fn, timeout = 300) {
@@ -138,8 +139,8 @@ class GraphQL extends Component {
         </form>
         <div className="list-group">
           {movies.map((m) => (
-            <a
-              href="#"
+            <Link
+              to={`/moviesgraphql/${m.id}`}
               key={m.id}
               className="list-group-item list-group-item-action"
             >
@@ -150,7 +151,7 @@ class GraphQL extends Component {
               </small>
               <br />
               {m.description.slice(0, 100)}...
-            </a>
+            </Link>
           ))}
         </div>
       </>
