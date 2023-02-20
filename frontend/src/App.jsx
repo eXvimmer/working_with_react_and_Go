@@ -11,6 +11,8 @@ import Login from "./routes/Login";
 import GraphQL from "./routes/GraphQL";
 import MovieGraphQL from "./components/MovieGraphQL";
 
+// TODO: replace localhost with environment variables
+
 class App extends Component {
   constructor(props) {
     super(props);
